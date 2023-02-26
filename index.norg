@@ -12,6 +12,10 @@ version: 1.0.0
 
   A few days ago I asked [Thibaut Lienart]{https://github.com/tlienart} {https://github.com/tlienart/Franklin.jl/issues/999}[how to setup Franklin.jl to work with Norg.jl]. [Norg.jl]{https://github.com/Klafyvel/Norg.jl} is a Julia package to parse [norg]{https://github.com/nvim-neorg/norg-specs} files, and [Franklin.jl]{https://franklinjl.org/} is a static website generator written in Julia. He kindly answered and told me to try making it work with [Xranklin.jl]{https://github.com/tlienart/Xranklin.jl}, the next version of Franklin.jl. If you are reading this, it means it worked! Here are the steps to make it work!
 
+  This is far from perfect (and you can see there is work to do if we want a proper integration), but this is still doable, and that means we can create a glue package for (X|F)ranklin.jl integration!
+
+  You can also check how the {spec}[Norg specification] is currently rendered or visit the {https://github.com/Klafyvel/NorgInXranklin.jl}[GitHub repository for this website].
+
 ** Create a new website and install dependencies.
 
    First things first, you need a working website setup. The easiest way to do that is to create it using [Franklin.jl] and then switch to [Xranklin.jl].
@@ -149,4 +153,3 @@ version: 1.0.0
 
    @end
 
-   This is far from perfect (and you can see there is work todo if we want a proper integration), but this is still doable, and that means we can create a glue package for (X|F)ranklin.jl integration!
