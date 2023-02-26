@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   
-  <link rel="stylesheet" href="/https://klafyvel.github.io/NorgInXranklin.jl/css/franklin.css">
-  <link rel="stylesheet" href="/https://klafyvel.github.io/NorgInXranklin.jl/css/basic.css">
-  <link rel="icon" href="/https://klafyvel.github.io/NorgInXranklin.jl/assets/favicon.png">
+  <link rel="stylesheet" href="/NorgInXranklin.jl/css/franklin.css">
+  <link rel="stylesheet" href="/NorgInXranklin.jl/css/basic.css">
+  <link rel="icon" href="/NorgInXranklin.jl/assets/favicon.png">
    <title>"The 1.0 Norg Specification"</title>  
 </head>
 <body>
   <header>
-<div class="blog-name"><a href="/https://klafyvel.github.io/NorgInXranklin.jl/">Basic Template</a></div>
+<div class="blog-name"><a href="/NorgInXranklin.jl/">Basic Template</a></div>
 <nav>
   <ul>
-    <li><a href="/https://klafyvel.github.io/NorgInXranklin.jl/">Home</a></li>
-    <li><a href="/https://klafyvel.github.io/NorgInXranklin.jl/spec/">Norg spec</a></li>
+    <li><a href="/NorgInXranklin.jl/">Home</a></li>
+    <li><a href="/NorgInXranklin.jl/spec/">Norg spec</a></li>
   </ul>
-  <img src="/https://klafyvel.github.io/NorgInXranklin.jl/assets/hamburger.svg" id="menu-icon">
+  <img src="/NorgInXranklin.jl/assets/hamburger.svg" id="menu-icon">
 </nav>
 </header>
 
@@ -601,7 +601,7 @@ This heading has priority A (highest priority)<p>     |end     Note that Norg do
 </section>
 <section id='section-h4-wiki-links'>
 <h4 id='h4-wiki-links'>Wiki Links (<code>?</code>)</h4>
-<p>     When building large knowledge bases it&apos;s sensible to want to quickly create links between files     without worrying about the location of said file. The <b>wiki link</b> allows you to link to any     heading in any file in the current workspace. You don&apos;t specify any file paths within the link,     just the title of the heading you want to search for.</p><p>     Syntax:     |example     Cats are <a href='/https://klafyvel.github.io/NorgInXranklin.jl/mammals'>mammals</a>, they make for great <a href='/https://klafyvel.github.io/NorgInXranklin.jl/house pets'>house pets</a> too!     |end</p><p>     For developers implementing this behavior: there are no restrictions in which order you parse     your files to hop between wiki links, as long as the following conditions are met:</p><ul><li><p>The current file is the first file that is searched (this allows for <code>?</code> to also work as a       generic catchall link for all heading levels)</p></li><li><p>All files in the current workspace are parsed/enumerated (including subdirectories)</p></li></ul><section id='section-h5-additional-behaviors-with-file'>
+<p>     When building large knowledge bases it&apos;s sensible to want to quickly create links between files     without worrying about the location of said file. The <b>wiki link</b> allows you to link to any     heading in any file in the current workspace. You don&apos;t specify any file paths within the link,     just the title of the heading you want to search for.</p><p>     Syntax:     |example     Cats are <a href='/NorgInXranklin.jl/mammals'>mammals</a>, they make for great <a href='/NorgInXranklin.jl/house pets'>house pets</a> too!     |end</p><p>     For developers implementing this behavior: there are no restrictions in which order you parse     your files to hop between wiki links, as long as the following conditions are met:</p><ul><li><p>The current file is the first file that is searched (this allows for <code>?</code> to also work as a       generic catchall link for all heading levels)</p></li><li><p>All files in the current workspace are parsed/enumerated (including subdirectories)</p></li></ul><section id='section-h5-additional-behaviors-with-file'>
 <h5 id='h5-additional-behaviors-with-file'>Additional Behaviors With <code>{:file:}</code></h5>
 <p>      The wiki link can also be used with the <code>{:file:}</code> to limit the search. It can actually double      as a &quot;heading catchall&quot; operator as mentioned in the previous section - it will match all      headings regardless of nesting level in the file provided.</p>
 </section>
@@ -723,7 +723,7 @@ This heading has priority A (highest priority)<p>     |end     Note that Norg do
 
 </div>
   <div class="page-foot">
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> "Septimia Zenobia". Last modified: 1.6774104136576047e9.
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> "Septimia Zenobia". Last modified: 1.6774109113708124e9.
     Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 </div>
 
