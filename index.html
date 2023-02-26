@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <link rel="stylesheet" href="/https://klafyvel.github.io/NorgInXranklin.jl/css/franklin.css">
+  <link rel="stylesheet" href="/https://klafyvel.github.io/NorgInXranklin.jl/css/basic.css">
+  <link rel="icon" href="/https://klafyvel.github.io/NorgInXranklin.jl/assets/favicon.png">
+   <title>"index"</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/https://klafyvel.github.io/NorgInXranklin.jl/">Basic Template</a></div>
+<nav>
+  <ul>
+    <li><a href="/https://klafyvel.github.io/NorgInXranklin.jl/">Home</a></li>
+    <li><a href="/https://klafyvel.github.io/NorgInXranklin.jl/spec/">Norg spec</a></li>
+  </ul>
+  <img src="/https://klafyvel.github.io/NorgInXranklin.jl/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+
+<div class="franklin-content" >
+  <div class="norg">
+    <section id='section-h1-a-simple-website-with-xranklin-jl-and-norg-jl'>
+<h1 id='h1-a-simple-website-with-xranklin-jl-and-norg-jl'>A simple website with Xranklin.jl and Norg.jl!</h1>
+
+</section>
+<p>  A few days ago I asked <a href='https://github.com/tlienart'>Thibaut Lienart</a> <a href='https://github.com/tlienart/Franklin.jl/issues/999'>how to setup Franklin.jl to work with Norg.jl</a>. <a href='https://github.com/Klafyvel/Norg.jl'>Norg.jl</a> is a Julia package to parse <a href='https://github.com/nvim-neorg/norg-specs'>norg</a> files, and <a href='https://franklinjl.org/'>Franklin.jl</a> is a static website generator written in Julia. He kindly answered and told me to try making it work with <a href='https://github.com/tlienart/Xranklin.jl'>Xranklin.jl</a>, the next version of Franklin.jl. If you are reading this, it means it worked! Here are the steps to make it work!</p><p>  This is far from perfect (and you can see there is work to do if we want a proper integration), but this is still doable, and that means we can create a glue package for (X|F)ranklin.jl integration!</p><p>  You can also check how the <a href='spec'>Norg specification</a> is currently rendered or visit the <a href='https://github.com/Klafyvel/NorgInXranklin.jl'>GitHub repository for this website</a>.</p><section id='section-h2-create-a-new-website-and-install-dependencies'>
+<h2 id='h2-create-a-new-website-and-install-dependencies'>Create a new website and install dependencies.</h2>
+
+</section>
+<p>   First things first, you need a working website setup. The easiest way to do that is to create it using <a href='#'>Franklin.jl</a> and then switch to <a href='#'>Xranklin.jl</a>.</p><pre>
+    <code class='language-julia'>
+           using Franklin
+   newsite(&quot;NorgInXranklin&quot;)
+   
+    </code>
+</pre>
+<p>   Then, you can switch to <a href='#'>Xranklin.jl</a>. The website generated is not yet compatible with the new library so for now simply delete <code>menu1.md</code>, <code>menu2.md</code>, <code>menu3.md</code> and most of the content in <code>index.md</code>. We don&apos;t need them anyway. You can then check that the website works. If it doesn&apos;t, keep deleting unnecessary things.</p><pre>
+    <code class='language-julia'>
+           using Xranklin
+   serve(debug=true)
+   
+    </code>
+</pre>
+<p>   Great! now we can install <a href='#'>Norg.jl</a>. The latest version is not released yet, so we will install the developpment version.</p><pre>
+    <code class='language-julia'>
+           Pkg.add(url=&quot;https://github.com/Klafyvel/Norg.jl&quot;, rev=&quot;main&quot;)
+   
+    </code>
+</pre>
+<p>   You can quickly check that <a href='#'>Norg.jl</a> works as intended.</p><pre>
+    <code class='language-julia'>
+           using Norg
+   norg&quot;* Hello, world!&quot;
+   
+    </code>
+</pre>
+<p>   You should get the following result:</p><pre>
+    <code class='language-plaintext'>
+           (K&quot;NorgDocument&quot;, 1, 9)
+   └─ (K&quot;Heading1&quot;, 2, 9)
+   └─ (K&quot;ParagraphSegment&quot;, 4, 8)
+   ├─ Hello
+   ├─ ,
+   ├─
+   ├─ world
+   └─ !
+   
+    </code>
+</pre>
+<section id='section-h2-invoking-norg-jl'>
+<h2 id='h2-invoking-norg-jl'>Invoking <a href='#'>Norg.jl</a></h2>
+<p>   Now is time to invoke <a href='#'>Norg.jl</a> to generate an HTML page from existing <code>.norg</code> files. This should happen within <code>utils.jl</code>. We need a <code>lx_norg</code> function there, based on <a href='https://github.com/tlienart/Xranklin.jl/blob/1394b6eb72ae58801e195633e25275cc4aa366d6/src/convert/markdown/lxfuns/literate.jl'>the literate.jl template</a>.</p><p>   I ended up with the following code (a bit hacky):</p><pre>
+    <code class='language-julia'>
+           &quot;&quot;&quot;
+   \\norg{rpath}
+   Try to find a norg file, resolve it and return it.
+   ## Notes
+   1. the `rpath` is taken relative to the website folder
+   2. the `rpath` must end with `.norg` and must not start with a `/`
+   &quot;&quot;&quot;
+   function lx_norg(p::Vector{String})::String
+     lc = cur_lc()
+     c = Xranklin._lx_check_nargs(:norg, p, 1)
+     isempty(c) || return c
+
+     rpath = Xranklin.unixify(strip(p[1]))
+     if !endswith(rpath, &quot;.norg&quot;)
+       @warn &quot;&quot;&quot;
+       \\norg{...}
+       The relative path
+       &lt;$rpath>
+       does not end with &apos;.norg&apos;.
+       &quot;&quot;&quot;
+       return Xranklin.failed_lxc(&quot;norg&quot;, p)
+     end
+
+     # try to form the full path to the norg file and check it&apos;s there
+     fpath = Xranklin.path(:folder) / rpath
+     if !isfile(fpath)
+       @warn &quot;&quot;&quot;
+       \\norg{...}
+       Couldn&apos;t find a norg file at path
+       &lt;$fpath>
+       (resolved from &apos;$rpath&apos;).
+       &quot;&quot;&quot;
+       return Xranklin.failed_lxc(&quot;norg&quot;, p)
+     end
+
+     # here fpath is the full path to an existing literate script
+     return _process_norg_file(lc, rpath, fpath)
+   end
+
+
+   function is_meta(ast, node)
+     if Norg.kind(node) ≠ Norg.K&quot;Verbatim&quot;
+       return false
+     end
+     c1,c2 = first(children(node), 2)
+     Norg.textify(ast, c1) == &quot;document&quot; &amp;&amp; Norg.textify(ast, c2) == &quot;meta&quot;
+   end
+
+   function parse_meta(ast, metanode)
+     d = Dict{Symbol, String}()
+     metacontent = Norg.textify(ast, last(children(metanode)))
+     for metaline in filter(!isempty, split(metacontent, &apos;\n&apos;))
+       k,v = split(metaline, r&quot;\s*:\s*&quot;)
+       d[Symbol(k)] = v        
+     end
+     d
+   end
+
+   &quot;&quot;&quot;
+   _process_norg_file(rpath, fpath)
+   Helper function to process a norg file located at `rpath` (`fpath`).
+   We pass `fpath` because it&apos;s already been resolved.
+   &quot;&quot;&quot;
+   function _process_norg_file(
+     lc::Xranklin.LocalContext,
+     rpath::String,
+     fpath::String
+   )::String
+     # Step 1: read the .norg file
+     s = open(fpath) do io
+       read(io, String)
+     end
+
+     # Step 2: parse the .norg file
+     ast = norg(s)
+
+     # Step 3: dirty trick to parse the `@document.meta` tag.
+     metanode = first(filter(x->is_meta(ast, x), collect(PreOrderDFS(ast.root))))
+     if !isnothing(metanode)
+       metadict = parse_meta(ast, metanode)
+       for (k,v) in metadict
+         setlvar!(k, v)
+       end
+     end
+
+     # Step 4: generate HTML
+     return string(Norg.codegen(HTMLTarget(), ast))
+   end
+
+   
+    </code>
+</pre>
+
+</section>
+
+    <section class="footnotes">
+    <ol>
+        
+    </ol>
+</section>
+
+</div>
+  <div class="page-foot">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> "Septimia Zenobia". Last modified: 1.6774104136576047e9.
+    Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+</div>
+
+</div>
+
+    
+    
+  </body>
+</html>
